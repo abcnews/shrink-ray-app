@@ -1,0 +1,53 @@
+{
+  "name": "@abcnews/shrink-ray-app",
+  "version": "1.0.0-pre.0",
+  "description": "Convert a video to optimised renditions in multiple aspect ratios, with the help of ffmpeg",
+  "license": "MIT",
+  "author": "Australian Broadcasting Corporation",
+  "contributors": [
+    "Colin Gourlay <Gourlay.Colin@abc.net.au>"
+  ],
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abcnews/shrink-ray-app.git"
+  },
+  "build": {
+    "appId": "au.net.abc.shrink-ray",
+    "productName": "Shrink Ray",
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    },
+    "linux": {
+      "target": "deb"
+    },
+    "deb": {
+      "compression": "gz"
+    }
+  },
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "electron-webpack dev",
+    "compile": "electron-webpack",
+    "dist": "npm run compile && electron-builder",
+    "dist:dir": "npm run dist -- --dir -c.compression=store -c.mac.identity=null"
+  },
+  "prettier": {
+    "printWidth": 80,
+    "semi": true,
+    "singleQuote": true,
+    "trailingComma": "es5"
+  },
+  "devDependencies": {
+    "electron": "^7.1.1",
+    "electron-builder": "^22.1.0",
+    "electron-webpack": "^2.7.4",
+    "electron-webpack-ts": "^3.2.0",
+    "typescript": "^3.7.2",
+    "webpack": "^4.41.2"
+  },
+  "dependencies": {
+    "@abcnews/shrink-ray": "^1.0.0",
+    "source-map-support": "^0.5.16"
+  }
+}
