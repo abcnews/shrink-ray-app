@@ -1,6 +1,10 @@
 import { ipcRenderer } from 'electron';
 import './styles.css';
 
+if (navigator.appVersion.indexOf('Mac') >= -1) {
+  document.documentElement.classList.add('is-mac');
+}
+
 const appEl = document.getElementById('app')!;
 
 appEl.innerHTML = `

@@ -1,27 +1,33 @@
+import * as os from 'os';
 import * as path from 'path';
 import { format as formatUrl } from 'url';
 import shrinkRay from '@abcnews/shrink-ray';
 import { app, ipcMain, BrowserWindow, Menu } from 'electron';
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const IS_DEVELOPMENT = process.env.NODE_ENV !== 'production';
+const IS_DARWIN = String(os.platform) === 'darwin';
+const BROWSER_WINDOW_WIDTH = 256;
+const BROWSER_WINDOW_HEIGHT = IS_DARWIN ? BROWSER_WINDOW_WIDTH : 320;
+
+const BROWSER_WINDOW_CONFIG = {
+  width: BROWSER_WINDOW_WIDTH,
+  height: BROWSER_WINDOW_HEIGHT,
+  minWidth: BROWSER_WINDOW_WIDTH,
+  minHeight: BROWSER_WINDOW_HEIGHT,
+  maxWidth: BROWSER_WINDOW_WIDTH,
+  maxHeight: BROWSER_WINDOW_HEIGHT,
+  frame: !IS_DARWIN,
+  webPreferences: {
+    nodeIntegration: true,
+  }
+};
 
 let mainWindow: BrowserWindow | null;
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
-    width: 256,
-    height: 256,
-    minWidth: 256,
-    minHeight: 256,
-    maxWidth: 256,
-    maxHeight: 256,
-    frame: false,
-    webPreferences: {
-      nodeIntegration: true,
-    },
-  });
+  mainWindow = new BrowserWindow(BROWSER_WINDOW_CONFIG);
 
-  if (isDevelopment) {
+  if (IS_DEVELOPMENT) {
     mainWindow.webContents.openDevTools();
     mainWindow.loadURL(
       `http://localhost:${process.env.ELECTRON_WEBPACK_WDS_PORT}`
