@@ -3,6 +3,7 @@ import * as path from 'path';
 import { format as formatUrl } from 'url';
 import shrinkRay from '@abcnews/shrink-ray';
 import { app, ipcMain, BrowserWindow, Menu } from 'electron';
+import * as contextMenu from 'electron-context-menu';
 
 const IS_DEVELOPMENT = process.env.NODE_ENV !== 'production';
 const IS_DARWIN = String(os.platform) === 'darwin';
@@ -19,10 +20,12 @@ const BROWSER_WINDOW_CONFIG = {
   frame: !IS_DARWIN,
   webPreferences: {
     nodeIntegration: true,
-  }
+  },
 };
 
 let mainWindow: BrowserWindow | null;
+let isProcessing: boolean = false;
+let shouldRetainAudio: boolean = false;
 
 function createWindow() {
   mainWindow = new BrowserWindow(BROWSER_WINDOW_CONFIG);
@@ -42,6 +45,21 @@ function createWindow() {
       })
     );
   }
+
+  contextMenu({
+    menu: _actions => [],
+    prepend: (_defaultActions, _params, _browserWindow) => [
+      {
+        label: 'Retain audio',
+        type: 'checkbox',
+        checked: shouldRetainAudio,
+        click: (_menuItem, _browserWindow, _event) =>
+          (shouldRetainAudio = !shouldRetainAudio),
+      },
+    ],
+    shouldShowMenu: (_event, _params) => !isProcessing,
+    window: mainWindow,
+  });
 
   mainWindow.on('closed', () => {
     mainWindow = null;
@@ -74,9 +92,14 @@ app.on('activate', () => {
 });
 
 ipcMain.handle('file-path', async (_event, file: string) => {
-  return await shrinkRay(file, {
+  isProcessing = true;
+
+  await shrinkRay(file, {
     onProgress: progress => {
       mainWindow.webContents.send('progress', progress);
     },
+    shouldRetainAudio,
   });
+
+  isProcessing = false;
 });
